@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Random Recipe Generator</title>
+<style>
+    td {
+        text-align: center;
+        padding: 5px;
+    }
+    .recipe-info {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .recipe-info th, .recipe-info td {
+        border: 1px solid #dddddd;
+        padding: 8px;
+    }
+    .recipe-info th {
+        background-color: #f2f2f2;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script>
+    function getRandomRecipe() {
+        var request = $.ajax({
+            method: "GET",
+            url: "https://tasty.p.rapidapi.com/recipes/list?from=0&to=20&tags=under_30_minutes",
+            headers: {
+                "X-RapidAPI-Key": "9424b9b377msh4a2a3368630db1ep1e59a1jsnd537b0169e64",
+                "X-RapidAPI-Host": "tasty.p.rapidapi.com"
+            }
+        });
+        request.done(function(response) {
+            if (response && response.results && response.results.length > 0) {
+                var randomIndex = Math.floor(Math.random() * response.results.length);
+                var recipeData = response.results[randomIndex];
+                var recipeHTML = "<table class='recipe-info'>";
+                recipeHTML += "<tr><th>Title</th><td>" + recipeData.name + "</td></tr>";
+                recipeHTML += "<tr><th>Description</th><td>" + recipeData.description + "</td></tr>";
+                recipeHTML += "<tr><th>Thumbnail</th><td><img width='300px' height='300px' src='" + recipeData.thumbnail_url + "' alt='" + recipeData.name + "'/></td></tr>";
+                recipeHTML += "</table>";
+                document.getElementById("recipeDisplayArea").innerHTML = recipeHTML;
+            } else {
+                document.getElementById("recipeDisplayArea").innerHTML = "No recipes found.";
+            }
+        });
+        request.fail(function(jqXHR, textStatus) {
+            document.getElementById("recipeDisplayArea").innerHTML = "Failed to fetch recipe: " + textStatus;
+        });
+    }
+</script>
+</head>
+<body>
+<hr>
+<h2>Random Recipe Generator</h2>
+<input type="button" onclick="getRandomRecipe()" value="Get Random Recipe">
+<hr>
+<div id="recipeDisplayArea"></div>
+<hr>
+</body>
+</html>
